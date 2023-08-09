@@ -1,17 +1,38 @@
 package pacote;
+import java.util.*;
 
 public class Contrato {
+	//TENHO QUE SALVAR O NUMERO DE PARCELAS QUE AINDA FALTAM SER PAGAS
+	//TENHO QUE SALVAR A VALIDADE DO CONTRATO
 	public static int cont=1;
-	private int idCliente, idVeiculo, idContrato;
-	private double[] parcelas;
-	Contrato (int idVeiculo, int idCliente, int qtdParcelas, double valor){
+	private int idCliente, idVeiculo, idContrato, parcelasRestantes;
+	private double[] parcela_semanal;
+	private double valor;
+	private Boolean validade;
+	Contrato (int idVeiculo, int idCliente, int qtdParcelas, int parcelasRestantes, double valor, Boolean validade, int id){
 		setIdVeiculo(idVeiculo);
 		setIdCliente(idCliente);
-		parcelas = new double[qtdParcelas];
-		for(int i=0; i< qtdParcelas; i++){
-			parcelas[i]=valor;
+		parcela_semanal = new double[qtdParcelas];
+		Arrays.fill(parcela_semanal,0);
+		if(parcelasRestantes==qtdParcelas) {
+			for(int i=0; i< qtdParcelas; i++){
+				parcela_semanal[i]=valor;
+			}
+		}else {
+			for(int i=(parcelasRestantes-1); i>=0 ; i--){
+				parcela_semanal[i]=valor;
+			}
 		}
-		setIdContrato(cont++);
+		setParcelasRestantes(parcelasRestantes);
+		setValor(valor);
+		if(id==0) {
+			setIdContrato(cont++);
+		}else {
+			cont=id;
+			setIdContrato(cont++);
+		}
+		//Enviar true pra quando for criar o contrato
+		setValidade(validade);
 	}
 	
 	public int getIdCliente() {
@@ -35,6 +56,17 @@ public class Contrato {
 		this.idContrato = idContrato;
 	}
 	
+	public int quantidadeDeParcelas() {
+		return this.parcela_semanal.length;
+	}
+	
+	public double getValor() {
+		return valor;
+	}	
+	public void setValor(double valor) {
+		this.valor = valor;
+	}
+	
 	public void imprime() {
 		System.out.println("+----------"
 				+ "\n|CONTRATO DE LOCAÇÃO"
@@ -43,5 +75,35 @@ public class Contrato {
 				+ "\n|Veículo: "+getIdVeiculo()
 				+ "\n|Parcelas: #####"
 				+ "\n+----------");
+	}
+
+	public void pagaParcela(int parcela) {
+		if(parcela_semanal[parcela-1]!=0) {
+			parcela_semanal[parcela-1]=0;
+		}
+	} 
+	public int parcelasRestantes() {
+		int qtd=0;
+		for(int i=0; i<parcela_semanal.length;i++) {
+			if(parcela_semanal[i]!=0) {
+				qtd++;
+			}
+		}
+		return qtd;
+	}
+
+	public Boolean getValidade() {
+		return validade;
+	}
+
+	public void setValidade(Boolean validade) {
+		this.validade = validade;
+	}
+	
+	public void setParcelasRestantes(int parcelas) {
+		this.parcelasRestantes=parcelas;
+	}
+	public int getParcelasRestantes() {
+		return parcelasRestantes;
 	}
 }

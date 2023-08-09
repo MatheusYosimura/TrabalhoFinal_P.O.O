@@ -5,10 +5,15 @@ public class Funcionario extends Pessoa{
 	private int idCadastro;
 	private String funcao;
 	
-	Funcionario(String nome, String endereco, int CPF, String funcao){
+	Funcionario(String nome, String endereco, int CPF, String funcao,int id){
 		super(nome, endereco, CPF);
 		setFuncao(funcao);
-		setIdCadastro(cont++);
+		if(id==-1) {
+			setIdCadastro(cont++);
+		}else {
+			cont=id;
+			setIdCadastro(cont++);
+		}
 	}
 	
 	public String getFuncao() {

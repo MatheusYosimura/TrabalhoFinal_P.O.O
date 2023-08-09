@@ -5,9 +5,10 @@ public class Cliente extends Pessoa{
 	private int cadastro;
 	private String pagamento;
 	
-	Cliente(String nome, String endereco, int CPF, String pagamento){
+	Cliente(String nome, String endereco, int CPF, String pagamento, int id){
 		super(nome, endereco, CPF);
 		setPagamento(pagamento);
+		if(id!=0){cont=id;}
 		setCadastro(cont++);
 	}
 	

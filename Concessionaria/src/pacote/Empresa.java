@@ -1,25 +1,70 @@
 package pacote;
-import java.util.ArrayList;
+import java.io.*;
+import java.util.*;
 
-public class Empresa {
+public class Empresa implements Organizacao{
 	public static Boolean exist=false;
 	private int CNPJ;
 	private String nome, endereco, razaoSocial;
-	private ArrayList<Funcionario>  funcionarios = new ArrayList();
-	private ArrayList<Veiculo> veiculos = new ArrayList();
-	private ArrayList<Contrato> contratos = new ArrayList();
+	private ArrayList<Funcionario>  funcionarios = new ArrayList<Funcionario>();
+	private ArrayList<Veiculo> veiculos = new ArrayList<Veiculo>();
+	private ArrayList<Contrato> contratos = new ArrayList<Contrato>();
+	private ArrayList<Garagem> garagem = new ArrayList<Garagem>();
+	private ArrayList<Cliente> clientes = new ArrayList<Cliente>();
 	
-	Empresa(String nome, String endereco, String razaoSocial, int CNPJ){
+	Empresa(String nome, String endereco, String razaoSocial, int CNPJ, int flag) throws IOException{
 		setNome(nome);
 		setEndereco(endereco);
 		setRazaoSocial(razaoSocial);
 		setCNPJ(CNPJ);
+		if(flag==1) {
+			carregaDadosVeiculo();
+			carregaDadosFuncionarios();
+			carregaDadosContratos();
+			carregaDadosClientes();
+		}
+		//salvaDadosEmpresa();
 		exist=true;
 	}
-	
-	public void adicionaVeiculo(String marca, String modelo, int ano) {
-		veiculos.add(new Veiculo(marca, modelo, ano));
+	public static Empresa carregaDadosEmpresa()throws IOException {
+		FileInputStream fis = new FileInputStream("/home/lym/eclipse-workspace/Concessionaria/dados/empresa.txt");
+		InputStreamReader isr = new InputStreamReader(fis);
+		BufferedReader br = new BufferedReader(isr);
+		Empresa emp = null;
+		String s = br.readLine();
+		if (s.equals("")) {
+			System.out.println("ERRO ao carregar arquivo da empresa");
+			System.exit(0);
+		}else{
+			String[] e = s.split(";");
+			String aux_nome = e[0], aux_end = e[1], aux_razao = e[2];
+			int aux_CNPJ = Integer.parseInt(e[3]);
+			emp = new Empresa(aux_nome,aux_end,aux_razao,aux_CNPJ,1);
+		}
+		return emp;
 	}
+	public void salvaDadosEmpresa() throws IOException{
+		OutputStream os = new FileOutputStream("dados/empresassss.txt");
+		OutputStreamWriter osw = new OutputStreamWriter(os);
+		BufferedWriter bw = new BufferedWriter(osw);
+		bw.write(getNome()+";"+getEndereco()+";"+getRazaoSocial()+";"+getCNPJ()+";\n");
+		bw.close();
+		osw.close();
+		os.close();
+		salvaDadosVeiculo();
+		salvaDadosFuncionarios();
+		salvaDadosContratos();
+		salvaDadosClientes();
+	}
+	
+	@Override
+	public int adicionaVeiculo(String marca, String modelo, int ano, int id) {
+		//Para criar um novo veículos, id=0
+		Veiculo veic = new Veiculo(marca, modelo, ano,id);
+		veiculos.add(veic);
+		return veic.getIdCadastro();
+	}
+	@Override
 	public Veiculo retornaVeiculo(int idVeiculo) {
 		Veiculo comparacao;
 		for(int i=0; i<veiculos.size(); i ++) {
@@ -31,10 +76,65 @@ public class Empresa {
 		System.out.println("Veículo não encontrado");
 		return null;
 	}
-	
-	public void adicionaFuncionario(String nome, String endereco, int CPF, String funcao) {
-		funcionarios.add(new Funcionario(nome, endereco, CPF, funcao));
+	public void carregaDadosVeiculo() throws IOException{
+		FileInputStream fis = new FileInputStream("/home/lym/eclipse-workspace/Concessionaria/dados/veiculos.txt");
+		InputStreamReader isr = new InputStreamReader(fis);
+		BufferedReader br = new BufferedReader(isr);
+		String s = br.readLine();
+		if (s.equals("")) {
+			System.out.println("Arquivo de veículos está vazio");
+		}else{
+			int aux_id,aux_ano;
+			String aux_marca,aux_modelo;
+			while(s!=null){
+				String[] v = s.split(";");
+				aux_marca=v[0];
+				aux_modelo=v[1];
+				aux_ano=Integer.parseInt(v[2]);
+				aux_id=Integer.parseInt(v[3]);
+				adicionaVeiculo(aux_marca,aux_modelo,aux_ano,aux_id);
+				s=br.readLine();
+			}
+		}
+		br.close();
+		isr.close();
+		fis.close();
+		System.out.println("FIM CARREGA VEICULOS");
 	}
+	public void salvaDadosVeiculo() throws IOException {
+		OutputStream os = new FileOutputStream("dados/veiculossss.txt");
+		OutputStreamWriter osw = new OutputStreamWriter(os);
+		BufferedWriter bw = new BufferedWriter(osw);
+		for(int i=0;i<veiculos.size();i++) {
+			Veiculo v = veiculos.get(i);
+			bw.write(v.getMarca()+";"+v.getModelo()+";"+v.getAno()+";"+v.getIdCadastro()+";\n");
+		}
+		bw.close();
+		osw.close();
+		os.close();
+		System.out.println("FIM SALVA VEICULOS");
+	}
+	public int retornaNumeroVeiculos() {
+		return veiculos.size();
+	}
+	public void atualizaDadosVeiculo(Veiculo v, int idVeiculo) {
+		Veiculo comparacao;
+		for(int i=0; i<veiculos.size(); i ++) {
+			comparacao=veiculos.get(i);
+			if(comparacao.getIdCadastro()==idVeiculo) {
+				veiculos.set(i, v);
+			}
+		}
+	}
+	
+	@Override
+	public int adicionaFuncionario(String nome, String endereco, int CPF, String funcao,int id) {
+		//Para criar um novo funcionario, id=0
+		Funcionario func = new Funcionario(nome, endereco, CPF, funcao,id);
+		funcionarios.add(func);
+		return func.getIdCadastro();
+	}
+	@Override
 	public Funcionario retornaFuncionario(int idFuncionario) {
 		Funcionario comparacao;
 		for(int i=0; i<funcionarios.size();i++){
@@ -46,10 +146,75 @@ public class Empresa {
 		System.out.println("Funcionario não encontrado");
 		return null;
 	}
-	
-	public void adicionaContrato(int idVeiculo, int idCliente, int parcelas, double valor){
-		contratos.add(new Contrato(idVeiculo, idCliente, parcelas, valor));
+	public void carregaDadosFuncionarios() throws IOException{
+		FileInputStream fis = new FileInputStream("/home/lym/eclipse-workspace/Concessionaria/dados/funcionarios.txt");
+		InputStreamReader isr = new InputStreamReader(fis);
+		BufferedReader br = new BufferedReader(isr);
+		String s = br.readLine();
+		if (s.equals("")) {
+			System.out.println("Arquivo de veículos está vazio");
+		}else{
+			int aux_id,aux_cpf;
+			String aux_nome,aux_funcao,aux_end;
+			while(s!=null){
+				String[] func = s.split(";");
+				aux_nome=func[0];
+				aux_end=func[1];
+				aux_cpf=Integer.parseInt(func[2]);
+				aux_funcao=func[3];
+				aux_id=Integer.parseInt(func[4]);
+				adicionaFuncionario(aux_nome,aux_end,aux_cpf,aux_funcao,aux_id);
+				s=br.readLine();
+			}
+		}
+		br.close();
+		isr.close();
+		fis.close();
+		System.out.println("FIM CARREGA FUNCIONARIOS");
 	}
+	public void salvaDadosFuncionarios()throws IOException{
+		OutputStream os = new FileOutputStream("dados/funcionariossss.txt");
+		OutputStreamWriter osw = new OutputStreamWriter(os);
+		BufferedWriter bw = new BufferedWriter(osw);
+		for(int i=0;i<funcionarios.size();i++) {
+			Funcionario f = funcionarios.get(i);
+			bw.write(f.getNome()+";"+f.getEndereco()+";"+f.getCPF()+";"+f.getFuncao()+";"+f.getIdCadastro()+";\n");
+		}
+		bw.close();
+		osw.close();
+		os.close();
+		System.out.println("FIM SALVA FUNCIONARIOS");
+	}
+	
+	@Override
+	public int adicionaContrato(int idVeiculo, int idCliente, int parcelas,int restantes, double valor,Boolean validade,int id){
+		//Para criar um novo contrato, id=0
+		Contrato cont = null;
+		if(id!=0) {
+			cont = new Contrato(idVeiculo, idCliente, parcelas,restantes, valor, validade, id);
+			contratos.add(cont);
+			return cont.getIdContrato();
+		}else{
+			Veiculo aux_veiculo = retornaVeiculo(idVeiculo);
+			if(aux_veiculo.getId_vaga()!=0) {
+				Garagem aux_garagem = retornaGaragem(aux_veiculo.getId_garagem());
+				Vaga aux_vaga = aux_garagem.retornaVaga(aux_veiculo.getId_vaga());
+				cont = new Contrato(idVeiculo, idCliente, parcelas, parcelas, valor, true, id);
+				contratos.add(cont);
+				aux_vaga.setId_Veiculo(0);
+				aux_vaga.liberaVaga();
+				System.out.println(aux_vaga.getNumero()+";"+aux_vaga.getOcupacao());
+				aux_garagem.atualizaVaga(aux_vaga,aux_veiculo.getId_vaga());				
+				atualizaDadosGaragem(aux_garagem,aux_veiculo.getId_garagem());
+				aux_veiculo.setId_vaga(0);
+				atualizaDadosVeiculo(aux_veiculo,idVeiculo);
+				return cont.getIdContrato();
+			}
+		}
+		return 0;
+		
+	}
+	@Override
 	public Contrato retornaContrato(int idContrato){
 		Contrato comparacao;
 		for (int i=0; i<contratos.size(); i++) {
@@ -61,13 +226,168 @@ public class Empresa {
 		System.out.println("Contrato não encontrado");
 		return null;
 	}
+	public void atualizaDadosContrato(Contrato contrato,int idContrato) {
+		Contrato comparacao;
+		for (int i=0; i<contratos.size(); i++) {
+			comparacao=contratos.get(i);
+			if(comparacao.getIdContrato()==idContrato) {
+				contratos.set(i,contrato);
+			}
+		}
+	}
+	public void carregaDadosContratos()throws IOException{
+		FileInputStream fis = new FileInputStream("/home/lym/eclipse-workspace/Concessionaria/dados/contratos.txt");
+		InputStreamReader isr = new InputStreamReader(fis);
+		BufferedReader br = new BufferedReader(isr);
+		String s = br.readLine();
+		if (s.equals("")) {
+			System.out.println("Arquivo de Contrato está vazio");
+		}else{
+			int aux_idCli,aux_idVei,aux_idCont,aux_parc,aux_rest;
+			double aux_valor;
+			Boolean validade;
+			while(s!=null){
+				String[] c = s.split(";");
+				aux_idVei=Integer.parseInt(c[0]);
+				aux_idCli=Integer.parseInt(c[1]);
+				aux_parc=Integer.parseInt(c[2]);
+				aux_rest=Integer.parseInt(c[3]);
+				aux_valor=Double.parseDouble(c[4]);
+				validade=Boolean.parseBoolean(c[5]);
+				aux_idCont=Integer.parseInt(c[6]);
+				adicionaContrato(aux_idVei,aux_idCli,aux_parc, aux_rest,aux_valor, validade, aux_idCont);
+				s=br.readLine();
+				//int idVeiculo, int idCliente, int qtdParcelas, int parcelasRestantes, double valor, Boolean validade, int id
+			}
+		}
+		br.close();
+		isr.close();
+		fis.close();
+		System.out.println("FIM CARREGA CONTRATOS");
+	}
+	public void salvaDadosContratos()throws IOException{
+		OutputStream os = new FileOutputStream("dados/contratosssss.txt");
+		OutputStreamWriter osw = new OutputStreamWriter(os);
+		BufferedWriter bw = new BufferedWriter(osw);
+		for(int i=0;i<contratos.size();i++) {
+			Contrato c = contratos.get(i);
+			bw.write(c.getIdVeiculo()+";"+c.getIdCliente()+";"+c.quantidadeDeParcelas()+";"
+			+c.parcelasRestantes()+";"+c.getValor()+";"+c.getValidade()+";"+c.getIdContrato()+";\n");
+		}
+		bw.close();
+		osw.close();
+		os.close();
+		System.out.println("FIM SALVA CONTRATOS");
+	}
+	public void pagaParcelaContrato(int idContrato, int parcela, double valor){
+		Contrato aux_contrato = retornaContrato(idContrato);
+		if(valor == aux_contrato.getValor()) {
+			aux_contrato.pagaParcela(parcela);
+			aux_contrato.setParcelasRestantes(aux_contrato.getParcelasRestantes()-1);
+			atualizaDadosContrato(aux_contrato,idContrato);
+		}
+	}
+	public void encerraContrato(int idContrato) {
+		Contrato aux_contrato = retornaContrato(idContrato);
+		if(aux_contrato.parcelasRestantes()==0) {
+			aux_contrato.setValidade(false);
+			Veiculo aux_veiculo = retornaVeiculo(aux_contrato.getIdVeiculo());
+			Garagem aux_garagem = retornaGaragem(aux_veiculo.getId_garagem());
+			for(int i=0,x=0; (i<aux_garagem.numeroDeVagas())&&(x==0);i++) {
+				Vaga aux_vaga = aux_garagem.getVagas(i);
+				if(aux_vaga.getOcupacao()==false) {
+					aux_garagem.preencheVaga(aux_vaga.getNumero(), aux_veiculo.getIdCadastro(),1);
+					x=1;
+				}
+			}
+		}else {
+			System.out.println("Ainda há parcelas a serem pagas");
+		}
+		
+	}
 	
+	public int associaGaragem(Garagem gar, Empresa empresa) {
+		int flag = 0; // Retorno da flag 0 = ERRO NA ASSOCIAÇÃO / 1 = ASSOCIAÇÃO BEM SUCEDIDA
+		if (gar.getAssociado()==0){
+			gar.setEmpresa(empresa);
+			flag=1;
+			this.garagem.add(gar);
+		}
+		return flag;
+	}
+	public Garagem retornaGaragem(int idGaragem) {
+		for(int i=0; i<garagem.size();i++) {
+			Garagem comparacao = garagem.get(i);
+			if(comparacao.getIdGaragem()==idGaragem) {
+				return comparacao;
+			}
+		}
+		return null;
+	}
+	public void atualizaDadosGaragem(Garagem g, int idGaragem) {
+		for(int i=0; i<garagem.size();i++) {
+			Garagem comparacao = garagem.get(i);
+			if(comparacao.getIdGaragem()==idGaragem) {
+				garagem.set(i, g);
+			}
+		}
+	}
+	
+	public int adicionaCliente(String nome, String endereco, int CPF, String pagamento, int id) {
+		//Para criar um novo contrato, id=0
+		Cliente cliente = new Cliente(nome,endereco,CPF,pagamento, id);
+		clientes.add(cliente);
+		return cliente.getCadastro();
+	}
+	public Cliente retornaCliente(int idCliente) {
+		Cliente cliente;
+		for (int i=0; i<clientes.size();i++) {
+			cliente = clientes.get(i); 
+			if(cliente.getCadastro()==idCliente) {
+				return cliente;
+			}
+		}
+		return null;
+	}
+	public void carregaDadosClientes() throws IOException{
+		InputStream is = new FileInputStream("dados/clientes.txt");
+		InputStreamReader isr = new InputStreamReader(is);
+		BufferedReader br = new BufferedReader(isr);
+		String s = br.readLine();
+		if (s.equals("")) {
+			System.out.println("Arquivo de Clientes está vazio");
+		}else{
+			while (s!=null) {
+				String[] c = s.split(";");
+				Cliente cliente = new Cliente(c[0],c[1],Integer.parseInt(c[2]),c[3],Integer.parseInt(c[4]));
+				clientes.add(cliente);
+				s=br.readLine();
+			}
+		}
+		br.close();
+		isr.close();
+		is.close();	
+		System.out.println("CarregaDadosClientes");
+	}
+	public void salvaDadosClientes()throws IOException{
+		OutputStream os = new FileOutputStream("dados/clientessss.txt");
+		OutputStreamWriter osw = new OutputStreamWriter(os);
+		BufferedWriter bw = new BufferedWriter(osw);
+		for (int i=0; i<clientes.size();i++) {
+			Cliente cliente = clientes.get(i);
+			bw.write(cliente.getNome()+";"+cliente.getEndereco()+";"+cliente.getCPF()+";"+cliente.getPagamento()+";"+cliente.getCadastro()+";\n");
+		}
+		bw.close();
+		osw.close();
+		os.close();
+		System.out.println("SalvaDadosClientes");
+	}
 	
 	public int getCNPJ() {
 		return CNPJ;
 	}
 	public void setCNPJ(int cNPJ) {
-		
+		this.CNPJ=cNPJ;
 	}
 	
 	public String getNome() {
@@ -90,5 +410,17 @@ public class Empresa {
 	public void setRazaoSocial(String razaoSocial) {
 		this.razaoSocial = razaoSocial;
 	}
-	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
