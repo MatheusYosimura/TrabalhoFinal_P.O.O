@@ -177,6 +177,15 @@ public class Empresa implements Organizacao{
 			}
 		}
 	}
+	public void atualizaDadosFuncionario(Funcionario funcionario,int idFuncionario) {
+		Funcionario comparacao;
+		for (int i=0; i<funcionarios.size(); i++) {
+			comparacao=funcionarios.get(i);
+			if(comparacao.getIdCadastro()==idFuncionario) {
+				funcionarios.set(i,funcionario);
+			}
+		}
+	}
 	@Override
 	public Funcionario retornaFuncionario(int idFuncionario) {
 		Funcionario comparacao;
@@ -227,6 +236,9 @@ public class Empresa implements Organizacao{
 		osw.close();
 		os.close();
 		System.out.println("FIM SALVA FUNCIONARIOS");
+	}
+	public int numeroDeFuncionarios() {
+		return funcionarios.size();
 	}
 	public String dadosFucionario(int aux_id, int aux_ind) {//ou AUX_ID = -1 ou AUX_IND = -1 
 		Funcionario func = null;
@@ -361,10 +373,15 @@ public class Empresa implements Organizacao{
 					x=1;
 				}
 			}
+			//atualizaDadosGaragem(aux_garagem,aux_garagem.getIdGaragem());
+			//atualizaDadosVeiculo(aux_veiculo,aux_veiculo.getIdCadastro());
 		}else {
 			System.out.println("Ainda há parcelas a serem pagas");
 		}
 		
+	}
+	public int numeroDeContratos() {
+		return contratos.size();
 	}
 	public String dadosContrato(int aux_id, int aux_ind) {//ou AUX_ID = -1 ou AUX_IND = -1 
 		Contrato contr = null;
@@ -422,6 +439,15 @@ public class Empresa implements Organizacao{
 			}
 		}
 	}
+	public void atualizaDadosCliente(Cliente cliente, int idCliente) {
+		Cliente comparacao;
+		for (int i=0; i<clientes.size(); i++) {
+			comparacao=clientes.get(i);
+			if(comparacao.getCadastro()==idCliente) {
+				clientes.set(i,cliente);
+			}
+		}
+	}
 	public Cliente retornaCliente(int idCliente) {
 		Cliente cliente;
 		for (int i=0; i<clientes.size();i++) {
@@ -452,6 +478,9 @@ public class Empresa implements Organizacao{
 		is.close();	
 		System.out.println("CarregaDadosClientes");
 	}
+	public int numeroDeClientes() {
+		return clientes.size();
+	}
 	public void salvaDadosClientes()throws IOException{
 		OutputStream os = new FileOutputStream("dados/clientessss.txt");
 		OutputStreamWriter osw = new OutputStreamWriter(os);
@@ -472,8 +501,8 @@ public class Empresa implements Organizacao{
 		if(aux_ind==-1) {clie = retornaCliente(aux_id);}
 		s = clie.toString();
 		return s;
-	}
-	
+	}	
+
 	public int getCNPJ() {
 		return CNPJ;
 	}

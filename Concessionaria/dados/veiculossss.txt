@@ -1,0 +1,10 @@
+marcaV;modeloV;2002;1;
+marcaV;modeloV;2002;2;
+marcaV;modeloV;2002;3;
+marcaV;modeloV;2002;4;
+marcaV;modeloV;2002;5;
+marcaV;modeloV;2002;6;
+marcaV;modeloV;2002;7;
+marcaV;modeloV;2002;8;
+marcaV;modeloV;2002;9;
+marcaV;modeloV;2002;10;

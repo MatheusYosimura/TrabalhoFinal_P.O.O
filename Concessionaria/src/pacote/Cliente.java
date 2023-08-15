@@ -8,8 +8,12 @@ public class Cliente extends Pessoa{
 	Cliente(String nome, String endereco, int CPF, String pagamento, int id){
 		super(nome, endereco, CPF);
 		setPagamento(pagamento);
-		if(id!=0){cont=id;}
-		setCadastro(cont++);
+		if(id==-1) {
+			setCadastro(cont++);
+		}else {
+			cont=id;
+			setCadastro(cont++);
+		}
 	}
 	
 	public String toString() {

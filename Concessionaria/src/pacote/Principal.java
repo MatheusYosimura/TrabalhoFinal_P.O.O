@@ -168,6 +168,14 @@ public class Principal {
 			  		Painel.mostraDadosVaga(empresa);
 			  		garagem=Painel.alteraDadosGaragem(garagem);
 			  		empresa.atualizaTotalGaragem(garagem);*/
+			  		//Painel.mostraDadosContrato(empresa);
+			  		//empresa=Painel.criaContrato(empresa);
+			  		//empresa=Painel.pagarParcela(empresa);
+			  		//empresa=Painel.encerraContrato(empresa);
+			  		Painel.mostraDadosCliente(empresa);
+			  		empresa=Painel.adicionaCliente(empresa);
+			  		empresa=Painel.removeCliente(empresa);
+			  		empresa=Painel.alteraDadosCliente(empresa);
 			  		empresa.salvaDadosEmpresa();
 			  		/*for(int i=0; i<garagem.size();i++) {//SALVA DADOS DAS GARAGEMS
 						Garagem g = garagem.get(i);
