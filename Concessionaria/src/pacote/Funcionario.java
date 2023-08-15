@@ -16,6 +16,18 @@ public class Funcionario extends Pessoa{
 		}
 	}
 	
+	public String toString() {
+		String s = "+-----------\n"+
+				   "| Funcionário "+getIdCadastro()+"\n"+
+				   "+-----------\n"+
+				   "|Nome: "+getNome()+"\n"+
+				   "|CPF: "+getCPF()+"\n"+
+				   "|Endereço: "+getEndereco()+"\n"+
+				   "|Função: "+getFuncao()+"\n"+
+				   "+-----------\n";
+		return s;
+	}
+	
 	public String getFuncao() {
 		return funcao;
 	}

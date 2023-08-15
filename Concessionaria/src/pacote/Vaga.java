@@ -13,6 +13,16 @@ public class Vaga {
 		setId_Veiculo(id_veiculo);
 		this.ocupacao=oc;
 	}
+	public String toString() {
+		String s = "+-----------\n"+
+				   "| Vaga "+getNumero()+"\n"+
+				   "+-----------\n"+
+				   "|Ocupação: "+getOcupacao()+"\n"+
+				   "|Veiculo: "+getId_Veiculo()+"\n"+
+				   "+-----------";
+		
+		return s;
+	}
 	
 	public int getNumero() {
 		return numero;

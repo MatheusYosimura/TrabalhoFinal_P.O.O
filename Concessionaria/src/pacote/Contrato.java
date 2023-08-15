@@ -35,6 +35,23 @@ public class Contrato {
 		setValidade(validade);
 	}
 	
+	public String toString(int Carro, int CPF) {
+		String s = "+-----------\n"+
+				   "| Contrato n: "+getIdContrato()+"\n"+
+				   "+-----------\n"+
+				   "|Veiculo: *********"+"\n"+
+				   "|CPF Cliente: "+CPF+"\n"+
+				   "|Validade: "+getValidade()+"\n"+
+				   "+-----------\n"+
+				   "| Parcelas \n"+
+				   "+------------\n";
+		for(int i=0;i<parcela_semanal.length;i++) {
+			s = s.concat("|["+(i+1)+"] = "+parcela_semanal[i]+"\n");
+		}
+		s = s.concat("+------------\n");
+		return s;
+	}
+	
 	public int getIdCliente() {
 		return idCliente;
 	}
@@ -67,16 +84,6 @@ public class Contrato {
 		this.valor = valor;
 	}
 	
-	public void imprime() {
-		System.out.println("+----------"
-				+ "\n|CONTRATO DE LOCAÇÃO"
-				+ "\n|Número do contrato: "+getIdContrato()
-				+ "\n|Cliente: "+getIdCliente()
-				+ "\n|Veículo: "+getIdVeiculo()
-				+ "\n|Parcelas: #####"
-				+ "\n+----------");
-	}
-
 	public void pagaParcela(int parcela) {
 		if(parcela_semanal[parcela-1]!=0) {
 			parcela_semanal[parcela-1]=0;

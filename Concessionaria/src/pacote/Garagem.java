@@ -16,18 +16,37 @@ public class Garagem {
 		for(int i=0; i<num; i++) {
 			vagas.add(new Vaga());
 		}
-		if(id_garagem!=0) {
-			cont=id_garagem;
-			setIdGaragem(id_garagem);
+		if(id_garagem==0) {
+			setIdGaragem(cont);
+			cont++;
 		}else {
-			setIdGaragem(cont++);
+			//if(cont<id_garagem) {cont=id_garagem;}
+			setIdGaragem(id_garagem);
+			cont++;
 		}
 	} 
-	
+	public static Garagem retornaGaragem(int idGaragem, ArrayList<Garagem> garagem) {
+		for(int i=0; i<garagem.size();i++) {
+			Garagem comparacao = garagem.get(i);
+			if(comparacao.getIdGaragem()==idGaragem) {
+				return comparacao;
+			}
+		}
+		return null;
+	}
+	public static void atualizaDadosGaragem(Garagem g, int idGaragem, ArrayList<Garagem> garagem) {
+		for(int i=0; i<garagem.size();i++) {
+			Garagem comparacao = garagem.get(i);
+			if(comparacao.getIdGaragem()==idGaragem) {
+				garagem.set(i, g);
+			}
+		}
+		//return garagem;//Chama por "empresa" mas quem recebe o retorno é "garagem"
+	}
 	public static ArrayList<Garagem> carregaDadosGaragem()throws IOException {
 		File f = new File("dados/garagem");
 		String[] lista = f.list();
-		ArrayList<Garagem> garagem = new ArrayList(); 
+		ArrayList<Garagem> garagem = new ArrayList<Garagem>(); 
 		for(int i=0; i<lista.length;i++) {
 			Garagem gar;
 			InputStream is = new FileInputStream("dados/garagem/"+lista[i]);
@@ -47,7 +66,6 @@ public class Garagem {
 			is.close();
 		}
 		System.out.println("CarregaDadosGaragem V");
-			
 		return garagem;//APOS RETORNAR, AS VAGAS DEVEM SER ASSOCIADAS AO SEUS VEICULOS
 	}
 	public void salvaDadosGaragem()throws IOException {
@@ -62,23 +80,33 @@ public class Garagem {
 		System.out.println("SalvaDadosGaragem");
 		salvaDadosVagas();
 	}
+	public String toString() {
+		String s = "+-----------\n"+
+				   "| Garagem "+getIdGaragem()+"\n"+
+				   "+-----------\n"+
+				   "|Nome: "+getNome()+"\n"+
+				   "|Associada: "+getEmpresa()+"\n"+
+				   "|Endereço: "+getNome()+"\n"+
+				   "|Número de vagas: "+numeroDeVagas()+"\n"+
+				   "+-----------";
+		return s;
+	}
 	
-	public void preencheVaga(int id_vaga, int id_carro, int id) {//PRECISA TER UMA EMPRESA ASSOCIADA PARA CHAMAR ESSE MÉTODO
+	public void preencheVaga(int id_vaga, int id_carro, int id) {//PRECISA TER EMPRESA ASSOCIADA 
 		Vaga vaga = retornaVaga(id_vaga);
-		if((vaga.getOcupacao()==false && getAssociado()==1) || id==0){ 
-			Veiculo veiculo = empresa.retornaVeiculo(id_carro);
+		Veiculo veiculo=null;
+		if((vaga.getOcupacao()==false && getAssociado()==1) || id==0){ //id=0 para quando a vaga precisa ser carregada
+			veiculo = empresa.retornaVeiculo(id_carro);
 			vaga.setId_Veiculo(veiculo.getIdCadastro());
 			atualizaVaga(vaga,id_vaga);
 			veiculo.setId_vaga(vaga.getNumero());
 			veiculo.setId_garagem(getIdGaragem());
-			empresa.atualizaDadosVeiculo(veiculo, id_carro);
 		}else {System.out.println("VAGA JÁ ESTÁ OCUPADA ( ALTERAR MÉTODO PARA PREENCHER VAGAS QUE FORAM SALVAS COM OCUPAÇÃO = TRUE");}
+		//return veiculo; / RETORNA VEICULO PARA ATUALIZAR
 	}
-	
 	public Vaga getVagas(int index){//TRABALHAR COM EXCESSÃO PARA PROGRAMA NÃO RETORNAR UMA VAGA NULL 
 		return vagas.get(index);
 	}
-
 	public void salvaDadosVagas()throws IOException {
 		OutputStream os = new FileOutputStream("dados/vagas/vagas_"+getIdGaragem()+"xx.txt");
 		OutputStreamWriter osw = new OutputStreamWriter(os);
@@ -91,10 +119,9 @@ public class Garagem {
 		osw.close();
 		os.close();
 		System.out.println("SalvaDadosVagas V");
-
 	}
 	public void carregaDadosVagas(int id_garagem) throws IOException{//CARREGA DADOS DA VAGA, MAS NÃO ASSOCIA VAGA X VEICULO
-		ArrayList<Vaga> vaga = new ArrayList();
+		ArrayList<Vaga> vaga = new ArrayList<Vaga>();
 		InputStream is = new FileInputStream("dados/vagas/vagas_"+id_garagem);
 		InputStreamReader isr = new InputStreamReader (is);
 		BufferedReader br = new BufferedReader(isr);
@@ -128,6 +155,13 @@ public class Garagem {
 			Vaga comparacao = vagas.get(i);
 			if (aux_vaga.getNumero()==comparacao.getNumero()){vagas.set(i,aux_vaga);}
 		}
+	}
+	public String DadosVaga(int aux_id, int aux_ind) {//ou AUX_ID = -1 ou AUX_IND = -1 
+		Vaga vag = null;
+		if(aux_id==-1) {vag = vagas.get(aux_ind);}
+		if(aux_ind==-1) {vag = retornaVaga(aux_id);}
+		String s = vag.toString();
+		return s;
 	}
 	
  	public String getNome() {

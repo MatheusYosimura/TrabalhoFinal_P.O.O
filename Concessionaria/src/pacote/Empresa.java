@@ -20,14 +20,13 @@ public class Empresa implements Organizacao{
 		if(flag==1) {
 			carregaDadosVeiculo();
 			carregaDadosFuncionarios();
-			carregaDadosContratos();
 			carregaDadosClientes();
 		}
 		//salvaDadosEmpresa();
 		exist=true;
 	}
 	public static Empresa carregaDadosEmpresa()throws IOException {
-		FileInputStream fis = new FileInputStream("/home/lym/eclipse-workspace/Concessionaria/dados/empresa.txt");
+		FileInputStream fis = new FileInputStream("dados/empresa.txt");
 		InputStreamReader isr = new InputStreamReader(fis);
 		BufferedReader br = new BufferedReader(isr);
 		Empresa emp = null;
@@ -41,6 +40,7 @@ public class Empresa implements Organizacao{
 			int aux_CNPJ = Integer.parseInt(e[3]);
 			emp = new Empresa(aux_nome,aux_end,aux_razao,aux_CNPJ,1);
 		}
+		br.close();
 		return emp;
 	}
 	public void salvaDadosEmpresa() throws IOException{
@@ -56,13 +56,34 @@ public class Empresa implements Organizacao{
 		salvaDadosContratos();
 		salvaDadosClientes();
 	}
+	public String toString() {
+		String s = "+-----------\n"+
+				   "| EMPRESA\n"+
+				   "+-----------\n"+
+				   "|Nome: "+getNome()+"\n"+
+				   "|Razão Social: "+getRazaoSocial()+"\n"+
+				   "|CNPJ: "+getCNPJ()+"\n"+
+				   "|Endereço: "+getEndereco()+"\n"+
+				   "+-----------\n";
+		return s;
+	}
 	
 	@Override
 	public int adicionaVeiculo(String marca, String modelo, int ano, int id) {
-		//Para criar um novo veículos, id=0
+		//Para criar um novo veículos, id=-1
 		Veiculo veic = new Veiculo(marca, modelo, ano,id);
 		veiculos.add(veic);
 		return veic.getIdCadastro();
+	}
+	public void removeVeiculo(int idVeiculo) {
+		Veiculo comparacao;
+		for(int i=0; i<veiculos.size(); i ++) {
+			comparacao=veiculos.get(i);
+			if(comparacao.getIdCadastro()==idVeiculo) {
+				System.out.println(comparacao.getIdCadastro());
+				veiculos.remove(i);
+			}
+		}
 	}
 	@Override
 	public Veiculo retornaVeiculo(int idVeiculo) {
@@ -126,6 +147,19 @@ public class Empresa implements Organizacao{
 			}
 		}
 	}
+	public String dadosVeiculo(int aux_id, int aux_ind) {//ou AUX_ID = -1 ou AUX_IND = -1 
+		Veiculo veic = null;
+		String s = null;
+		if(aux_id==-1) {veic = veiculos.get(aux_ind);}
+		if(aux_ind==-1) {veic = retornaVeiculo(aux_id);}
+		if(veic.getId_garagem()==0){
+			s = veic.toString("-----","-----");
+		}else{
+			Garagem gara = retornaGaragem(veic.getId_garagem());
+			s = veic.toString(gara.getNome(),""+veic.getId_vaga());
+		}
+		return s;
+	}
 	
 	@Override
 	public int adicionaFuncionario(String nome, String endereco, int CPF, String funcao,int id) {
@@ -133,6 +167,15 @@ public class Empresa implements Organizacao{
 		Funcionario func = new Funcionario(nome, endereco, CPF, funcao,id);
 		funcionarios.add(func);
 		return func.getIdCadastro();
+	}
+	public void removeFuncionario(int idFuncionario) {
+		Funcionario comparacao;
+		for(int i=0; i<funcionarios.size();i++){
+			comparacao = funcionarios.get(i);
+			if(comparacao.getIdCadastro()==idFuncionario) {
+				funcionarios.remove(i);
+			}
+		}
 	}
 	@Override
 	public Funcionario retornaFuncionario(int idFuncionario) {
@@ -185,7 +228,15 @@ public class Empresa implements Organizacao{
 		os.close();
 		System.out.println("FIM SALVA FUNCIONARIOS");
 	}
+	public String dadosFucionario(int aux_id, int aux_ind) {//ou AUX_ID = -1 ou AUX_IND = -1 
+		Funcionario func = null;
+		if(aux_id==-1) {func = funcionarios.get(aux_ind);}
+		if(aux_ind==-1) {func = retornaFuncionario(aux_id);}
+		String s = func.toString();
+		return s;
+	}
 	
+	//CONTRATO nÃO PODE TER MAIS DE 8 PARCELAS ( 8 semanas de uso do carro)
 	@Override
 	public int adicionaContrato(int idVeiculo, int idCliente, int parcelas,int restantes, double valor,Boolean validade,int id){
 		//Para criar um novo contrato, id=0
@@ -235,7 +286,7 @@ public class Empresa implements Organizacao{
 			}
 		}
 	}
-	public void carregaDadosContratos()throws IOException{
+	public void carregaDadosContratos()throws IOException{//SOMENTE APÓS O CARREGAMENTO DAS GARAGENS
 		FileInputStream fis = new FileInputStream("/home/lym/eclipse-workspace/Concessionaria/dados/contratos.txt");
 		InputStreamReader isr = new InputStreamReader(fis);
 		BufferedReader br = new BufferedReader(isr);
@@ -256,8 +307,18 @@ public class Empresa implements Organizacao{
 				validade=Boolean.parseBoolean(c[5]);
 				aux_idCont=Integer.parseInt(c[6]);
 				adicionaContrato(aux_idVei,aux_idCli,aux_parc, aux_rest,aux_valor, validade, aux_idCont);
+				if(validade==true) {
+					Veiculo aux_veic = retornaVeiculo(aux_idVei);
+					Garagem aux_gar = retornaGaragem(aux_veic.getId_garagem());
+					Vaga aux_vaga = aux_gar.retornaVaga(aux_veic.getId_vaga());
+					aux_vaga.setId_Veiculo(0);
+					aux_vaga.liberaVaga();
+					aux_gar.atualizaVaga(aux_vaga, aux_vaga.getNumero());
+					atualizaDadosGaragem(aux_gar,aux_veic.getId_garagem());
+					aux_veic.setId_vaga(0);
+					atualizaDadosVeiculo(aux_veic,aux_idVei);
+				}
 				s=br.readLine();
-				//int idVeiculo, int idCliente, int qtdParcelas, int parcelasRestantes, double valor, Boolean validade, int id
 			}
 		}
 		br.close();
@@ -305,6 +366,15 @@ public class Empresa implements Organizacao{
 		}
 		
 	}
+	public String dadosContrato(int aux_id, int aux_ind) {//ou AUX_ID = -1 ou AUX_IND = -1 
+		Contrato contr = null;
+		if(aux_id==-1) {contr = contratos.get(aux_ind);}
+		if(aux_ind==-1) {contr = retornaContrato(aux_id);}
+		Cliente clie = retornaCliente(contr.getIdCliente());
+		Veiculo veic = retornaVeiculo(contr.getIdVeiculo());
+		String s = contr.toString(0,clie.getCPF());// 0 deve ser substituido pela placa
+		return s;
+	}
 	
 	public int associaGaragem(Garagem gar, Empresa empresa) {
 		int flag = 0; // Retorno da flag 0 = ERRO NA ASSOCIAÇÃO / 1 = ASSOCIAÇÃO BEM SUCEDIDA
@@ -331,6 +401,10 @@ public class Empresa implements Organizacao{
 				garagem.set(i, g);
 			}
 		}
+		//return garagem;//Chama por "empresa" mas quem recebe o retorno é "garagem"
+	}
+	public void atualizaTotalGaragem(ArrayList<Garagem> aux_gar) {
+		this.garagem = aux_gar;
 	}
 	
 	public int adicionaCliente(String nome, String endereco, int CPF, String pagamento, int id) {
@@ -338,6 +412,15 @@ public class Empresa implements Organizacao{
 		Cliente cliente = new Cliente(nome,endereco,CPF,pagamento, id);
 		clientes.add(cliente);
 		return cliente.getCadastro();
+	}
+	public void removeCliente(int idCliente) {
+		Cliente cliente;
+		for (int i=0; i<clientes.size();i++) {
+			cliente = clientes.get(i); 
+			if(cliente.getCadastro()==idCliente) {
+				clientes.remove(i);
+			}
+		}
 	}
 	public Cliente retornaCliente(int idCliente) {
 		Cliente cliente;
@@ -381,6 +464,14 @@ public class Empresa implements Organizacao{
 		osw.close();
 		os.close();
 		System.out.println("SalvaDadosClientes");
+	}
+	public String dadosCliente(int aux_id, int aux_ind) {//ou AUX_ID = -1 ou AUX_IND = -1 
+		String s = null;
+		Cliente clie = null;
+		if(aux_id==-1) {clie = clientes.get(aux_ind);}
+		if(aux_ind==-1) {clie = retornaCliente(aux_id);}
+		s = clie.toString();
+		return s;
 	}
 	
 	public int getCNPJ() {
