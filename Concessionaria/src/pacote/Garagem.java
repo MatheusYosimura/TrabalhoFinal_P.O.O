@@ -1,5 +1,8 @@
 package pacote;
 import java.util.ArrayList;
+
+import javax.swing.JOptionPane;
+
 import java.io.*;
 
 public class Garagem {
@@ -48,13 +51,19 @@ public class Garagem {
 		String[] lista = f.list();
 		ArrayList<Garagem> garagem = new ArrayList<Garagem>(); 
 		for(int i=0; i<lista.length;i++) {
+			if(TratamentoExcecoes.verificaArquivo("dados/garagem", "garagem_"+(i+1))){
+				return null;
+			}
 			Garagem gar;
 			InputStream is = new FileInputStream("dados/garagem/"+lista[i]);
 			InputStreamReader isr = new InputStreamReader(is);
 			BufferedReader br = new BufferedReader(isr);
 			String[] g = (br.readLine()).split(";");
 			gar  = new Garagem(g[0], g[1], Integer.parseInt(g[2]), Integer.parseInt(g[3]));
-			gar.carregaDadosVagas(Integer.parseInt(g[3]));
+			if(gar.carregaDadosVagas(Integer.parseInt(g[3]))) {
+				JOptionPane.showMessageDialog(null, "Vagas da garagem não carregadas\nCarregamento das garagens interrompido");
+				return null;
+			}
 			/*for (int j=0;j<gar[i].vagas.size();i++) {//PRECISA TER UMA EMPRESA ASSOCIADA PARA CHAMAR ESSE MÉTODO
 				Vaga aux_vaga = gar[i].vagas.get(j);
 				gar[i].preencheVaga(aux_vaga.getNumero(),aux_vaga.getId_Veiculo());
@@ -85,7 +94,7 @@ public class Garagem {
 				   "| Garagem "+getIdGaragem()+"\n"+
 				   "+-----------\n"+
 				   "|Nome: "+getNome()+"\n"+
-				   "|Associada: "+getEmpresa()+"\n"+
+				   "|Associada: "+getEmpresa().getNome()+"\n"+
 				   "|Endereço: "+getNome()+"\n"+
 				   "|Número de vagas: "+numeroDeVagas()+"\n"+
 				   "+-----------";
@@ -120,8 +129,11 @@ public class Garagem {
 		os.close();
 		System.out.println("SalvaDadosVagas V");
 	}
-	public void carregaDadosVagas(int id_garagem) throws IOException{//CARREGA DADOS DA VAGA, MAS NÃO ASSOCIA VAGA X VEICULO
+	public Boolean carregaDadosVagas(int id_garagem) throws IOException{//CARREGA DADOS DA VAGA, MAS NÃO ASSOCIA VAGA X VEICULO
 		ArrayList<Vaga> vaga = new ArrayList<Vaga>();
+		if(TratamentoExcecoes.verificaArquivo("dados/vagas", "vagas_"+(id_garagem))){
+			return true;
+		}
 		InputStream is = new FileInputStream("dados/vagas/vagas_"+id_garagem);
 		InputStreamReader isr = new InputStreamReader (is);
 		BufferedReader br = new BufferedReader(isr);
@@ -137,7 +149,7 @@ public class Garagem {
 		br.close();
 		isr.close();
 		is.close();
-		//return vaga;
+		return false;
 	}
 	public int numeroDeVagas() {
 		return vagas.size();

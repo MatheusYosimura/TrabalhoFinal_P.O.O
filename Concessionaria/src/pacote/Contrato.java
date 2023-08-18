@@ -19,8 +19,8 @@ public class Contrato {
 				parcela_semanal[i]=valor;
 			}
 		}else {
-			for(int i=(parcelasRestantes-1); i>=0 ; i--){
-				parcela_semanal[i]=valor;
+			for(int i=(parcelasRestantes), j=(qtdParcelas-1); i>0 ; i--, j--){
+				parcela_semanal[j]=valor;
 			}
 		}
 		setParcelasRestantes(parcelasRestantes);
@@ -84,10 +84,12 @@ public class Contrato {
 		this.valor = valor;
 	}
 	
-	public void pagaParcela(int parcela) {
+	public int pagaParcela(int parcela) {
 		if(parcela_semanal[parcela-1]!=0) {
 			parcela_semanal[parcela-1]=0;
+			return 0;
 		}
+		return 1;
 	} 
 	public int parcelasRestantes() {
 		int qtd=0;

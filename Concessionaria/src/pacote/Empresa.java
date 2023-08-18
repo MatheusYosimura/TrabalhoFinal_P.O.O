@@ -26,6 +26,9 @@ public class Empresa implements Organizacao{
 		exist=true;
 	}
 	public static Empresa carregaDadosEmpresa()throws IOException {
+		if(TratamentoExcecoes.verificaArquivo("dados", "empresa.txt")){
+			return null;
+		}
 		FileInputStream fis = new FileInputStream("dados/empresa.txt");
 		InputStreamReader isr = new InputStreamReader(fis);
 		BufferedReader br = new BufferedReader(isr);
@@ -98,7 +101,10 @@ public class Empresa implements Organizacao{
 		return null;
 	}
 	public void carregaDadosVeiculo() throws IOException{
-		FileInputStream fis = new FileInputStream("/home/lym/eclipse-workspace/Concessionaria/dados/veiculos.txt");
+		if(TratamentoExcecoes.verificaArquivo("dados", "veiculos.txt")){
+			return ;
+		}
+		FileInputStream fis = new FileInputStream("dados/veiculos.txt");
 		InputStreamReader isr = new InputStreamReader(fis);
 		BufferedReader br = new BufferedReader(isr);
 		String s = br.readLine();
@@ -195,11 +201,13 @@ public class Empresa implements Organizacao{
 				return comparacao;
 			}
 		}
-		System.out.println("Funcionario não encontrado");
 		return null;
 	}
 	public void carregaDadosFuncionarios() throws IOException{
-		FileInputStream fis = new FileInputStream("/home/lym/eclipse-workspace/Concessionaria/dados/funcionarios.txt");
+		if(TratamentoExcecoes.verificaArquivo("dados", "funcionarios.txt")){
+			return ;
+		}
+		FileInputStream fis = new FileInputStream("dados/funcionarios.txt");
 		InputStreamReader isr = new InputStreamReader(fis);
 		BufferedReader br = new BufferedReader(isr);
 		String s = br.readLine();
@@ -250,13 +258,12 @@ public class Empresa implements Organizacao{
 	
 	//CONTRATO nÃO PODE TER MAIS DE 8 PARCELAS ( 8 semanas de uso do carro)
 	@Override
-	public int adicionaContrato(int idVeiculo, int idCliente, int parcelas,int restantes, double valor,Boolean validade,int id){
+	public void adicionaContrato(int idVeiculo, int idCliente, int parcelas,int restantes, double valor,Boolean validade,int id){
 		//Para criar um novo contrato, id=0
 		Contrato cont = null;
 		if(id!=0) {
 			cont = new Contrato(idVeiculo, idCliente, parcelas,restantes, valor, validade, id);
 			contratos.add(cont);
-			return cont.getIdContrato();
 		}else{
 			Veiculo aux_veiculo = retornaVeiculo(idVeiculo);
 			if(aux_veiculo.getId_vaga()!=0) {
@@ -271,11 +278,8 @@ public class Empresa implements Organizacao{
 				atualizaDadosGaragem(aux_garagem,aux_veiculo.getId_garagem());
 				aux_veiculo.setId_vaga(0);
 				atualizaDadosVeiculo(aux_veiculo,idVeiculo);
-				return cont.getIdContrato();
 			}
-		}
-		return 0;
-		
+		}		
 	}
 	@Override
 	public Contrato retornaContrato(int idContrato){
@@ -299,7 +303,10 @@ public class Empresa implements Organizacao{
 		}
 	}
 	public void carregaDadosContratos()throws IOException{//SOMENTE APÓS O CARREGAMENTO DAS GARAGENS
-		FileInputStream fis = new FileInputStream("/home/lym/eclipse-workspace/Concessionaria/dados/contratos.txt");
+		if(TratamentoExcecoes.verificaArquivo("dados", "contratos.txt")){
+			return;
+		}
+		FileInputStream fis = new FileInputStream("dados/contratos.txt");
 		InputStreamReader isr = new InputStreamReader(fis);
 		BufferedReader br = new BufferedReader(isr);
 		String s = br.readLine();
@@ -355,7 +362,9 @@ public class Empresa implements Organizacao{
 	public void pagaParcelaContrato(int idContrato, int parcela, double valor){
 		Contrato aux_contrato = retornaContrato(idContrato);
 		if(valor == aux_contrato.getValor()) {
-			aux_contrato.pagaParcela(parcela);
+			if(aux_contrato.pagaParcela(parcela)==1) {
+				new TratamentoExcecoes("Parcela já paga\nOrdem de pagamento cancelada!");
+			}
 			aux_contrato.setParcelasRestantes(aux_contrato.getParcelasRestantes()-1);
 			atualizaDadosContrato(aux_contrato,idContrato);
 		}
@@ -459,6 +468,9 @@ public class Empresa implements Organizacao{
 		return null;
 	}
 	public void carregaDadosClientes() throws IOException{
+		if(TratamentoExcecoes.verificaArquivo("dados", "clientes.txt")){
+			return ;
+		}
 		InputStream is = new FileInputStream("dados/clientes.txt");
 		InputStreamReader isr = new InputStreamReader(is);
 		BufferedReader br = new BufferedReader(isr);
