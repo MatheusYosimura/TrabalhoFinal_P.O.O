@@ -1,25 +1,40 @@
 package pacote;
 import static org.junit.Assert.*;
+import java.util.*;
+import java.io.IOException;
 import org.junit.Test;
 
 public class EmpresaTeste {
-	Empresa empresa = new Empresa("nome","endereco","razaosocial", 1234);
-	public void testeEmpresa() {
-		assertEquals("nome",empresa.getNome());	
-	}
-	public void testeVeiculo() {
-		int ID = empresa.adicionaVeiculo("marca", "modelo", 2002);
-		Veiculo veiculo = empresa.retornaVeiculo(ID);
-		assertEquals(ID,veiculo.getIdCadastro());
-	}
-	public void testeFuncionario() {
-		int ID = empresa.adicionaFuncionario("nome", "endereco", 1001, "funcao");
-		Funcionario funcionario = empresa.retornaFuncionario(ID);
-		assertEquals(ID,funcionario.getIdCadastro());
-	}
-	public void testeContrato(){
-		int ID = empresa.adicionaContrato(123, 123, 10, 100.00);
-		Contrato contrato = empresa.retornaContrato(ID);
-		assertEquals(ID,contrato.getIdContrato());
+	Empresa empresaTeste = null;
+	ArrayList<Garagem> garagem = new ArrayList<Garagem>();
+	@Test
+	public void testeTotal() throws IOException {
+		empresaTeste = new Empresa("nome","endereco","razao",123,0);
+		garagem.add(new Garagem("garagem_teste","endereco_teste",10,0));
+		Garagem garagemTeste= garagem.get(0);
+		empresaTeste.associaGaragem(garagemTeste, empresaTeste);
+		empresaTeste.adicionaVeiculo("veiculo_teste", "modelo_teste", 2001, -1);
+		Veiculo veiculoTeste = empresaTeste.retornaVeiculo(1);
+		empresaTeste.adicionaFuncionario("nome_teste", "enredeco_teste", 123123, "função_teste", -1);
+		Funcionario funcionarioTeste = empresaTeste.retornaFuncionario(1);
+		empresaTeste.adicionaCliente("nome_teste", "endereco_teste", 321321, "método_teste", -1);
+		Cliente clienteTeste = empresaTeste.retornaCliente(1);
+		empresaTeste.adicionaContrato(1, 1, 1, 1, 10, true, 0);
+		Contrato contratoTeste = empresaTeste.retornaContrato(1);
+		assertEquals(123, empresaTeste.getCNPJ());
+		assertEquals(1,garagemTeste.getIdGaragem());
+		assertEquals(1,veiculoTeste.getIdCadastro());		
+		assertEquals(1,funcionarioTeste.getIdCadastro());
+		assertEquals(1,clienteTeste.getCadastro());
+		assertEquals(1,contratoTeste.getIdContrato());
+		empresaTeste.pagaParcelaContrato(1, 1, 10);
+		empresaTeste.encerraContrato(1);
+		empresaTeste.removeVeiculo(1);
+		empresaTeste.removeFuncionario(1);
+		empresaTeste.removeCliente(1);
+		assertEquals(null,empresaTeste.retornaVeiculo(1));
+		assertEquals(null,empresaTeste.retornaFuncionario(1));
+		assertEquals(null,empresaTeste.retornaCliente(1));
+		assertEquals(false,(empresaTeste.retornaContrato(1)).getValidade());
 	}
 }

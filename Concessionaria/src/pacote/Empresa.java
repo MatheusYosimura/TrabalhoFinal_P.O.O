@@ -12,7 +12,7 @@ public class Empresa implements Organizacao{
 	private ArrayList<Garagem> garagem = new ArrayList<Garagem>();
 	private ArrayList<Cliente> clientes = new ArrayList<Cliente>();
 	
-	Empresa(String nome, String endereco, String razaoSocial, int CNPJ, int flag) throws IOException{
+	public Empresa(String nome, String endereco, String razaoSocial, int CNPJ, int flag) throws IOException{
 		setNome(nome);
 		setEndereco(endereco);
 		setRazaoSocial(razaoSocial);
@@ -35,8 +35,8 @@ public class Empresa implements Organizacao{
 		Empresa emp = null;
 		String s = br.readLine();
 		if (s.equals("")) {
-			System.out.println("ERRO ao carregar arquivo da empresa");
-			System.exit(0);
+			new TratamentoExcecoes("Arquivo da empresa está vazio ou corrompido");
+			return null;
 		}else{
 			String[] e = s.split(";");
 			String aux_nome = e[0], aux_end = e[1], aux_razao = e[2];
@@ -47,7 +47,7 @@ public class Empresa implements Organizacao{
 		return emp;
 	}
 	public void salvaDadosEmpresa() throws IOException{
-		OutputStream os = new FileOutputStream("dados/empresassss.txt");
+		OutputStream os = new FileOutputStream("dados/empresas_salvamento.txt");
 		OutputStreamWriter osw = new OutputStreamWriter(os);
 		BufferedWriter bw = new BufferedWriter(osw);
 		bw.write(getNome()+";"+getEndereco()+";"+getRazaoSocial()+";"+getCNPJ()+";\n");
@@ -76,6 +76,16 @@ public class Empresa implements Organizacao{
 		//Para criar um novo veículos, id=-1
 		Veiculo veic = new Veiculo(marca, modelo, ano,id);
 		veiculos.add(veic);
+		for(int i=0; i<garagem.size(); i++) {
+			Garagem aux_garagem = garagem.get(i);
+			for(int j=0,x=0; (j<aux_garagem.numeroDeVagas())&&(x==0);j++) {
+				Vaga aux_vaga = aux_garagem.getVagas(j);
+				if(aux_vaga.getOcupacao()==false) {
+					aux_garagem.preencheVaga(aux_vaga.getNumero(), veic.getIdCadastro(),1);
+					x=1;
+				}
+			}
+		}
 		return veic.getIdCadastro();
 	}
 	public void removeVeiculo(int idVeiculo) {
@@ -83,7 +93,7 @@ public class Empresa implements Organizacao{
 		for(int i=0; i<veiculos.size(); i ++) {
 			comparacao=veiculos.get(i);
 			if(comparacao.getIdCadastro()==idVeiculo) {
-				System.out.println(comparacao.getIdCadastro());
+				//System.out.println(comparacao.getIdCadastro());
 				veiculos.remove(i);
 			}
 		}
@@ -97,7 +107,7 @@ public class Empresa implements Organizacao{
 				return comparacao;
 			}
 		}
-		System.out.println("Veículo não encontrado");
+		//System.out.println("Veículo não encontrado");
 		return null;
 	}
 	public void carregaDadosVeiculo() throws IOException{
@@ -109,7 +119,8 @@ public class Empresa implements Organizacao{
 		BufferedReader br = new BufferedReader(isr);
 		String s = br.readLine();
 		if (s.equals("")) {
-			System.out.println("Arquivo de veículos está vazio");
+			new TratamentoExcecoes("Arquivo de veiculos está vazio ou corrompido");
+			return;
 		}else{
 			int aux_id,aux_ano;
 			String aux_marca,aux_modelo;
@@ -129,7 +140,7 @@ public class Empresa implements Organizacao{
 		System.out.println("FIM CARREGA VEICULOS");
 	}
 	public void salvaDadosVeiculo() throws IOException {
-		OutputStream os = new FileOutputStream("dados/veiculossss.txt");
+		OutputStream os = new FileOutputStream("dados/veiculos_salvamento.txt");
 		OutputStreamWriter osw = new OutputStreamWriter(os);
 		BufferedWriter bw = new BufferedWriter(osw);
 		for(int i=0;i<veiculos.size();i++) {
@@ -139,7 +150,7 @@ public class Empresa implements Organizacao{
 		bw.close();
 		osw.close();
 		os.close();
-		System.out.println("FIM SALVA VEICULOS");
+		//System.out.println("FIM SALVA VEICULOS");
 	}
 	public int retornaNumeroVeiculos() {
 		return veiculos.size();
@@ -230,10 +241,10 @@ public class Empresa implements Organizacao{
 		br.close();
 		isr.close();
 		fis.close();
-		System.out.println("FIM CARREGA FUNCIONARIOS");
+		//System.out.println("FIM CARREGA FUNCIONARIOS");
 	}
 	public void salvaDadosFuncionarios()throws IOException{
-		OutputStream os = new FileOutputStream("dados/funcionariossss.txt");
+		OutputStream os = new FileOutputStream("dados/funcionarios_salvamento.txt");
 		OutputStreamWriter osw = new OutputStreamWriter(os);
 		BufferedWriter bw = new BufferedWriter(osw);
 		for(int i=0;i<funcionarios.size();i++) {
@@ -243,7 +254,7 @@ public class Empresa implements Organizacao{
 		bw.close();
 		osw.close();
 		os.close();
-		System.out.println("FIM SALVA FUNCIONARIOS");
+		//System.out.println("FIM SALVA FUNCIONARIOS");
 	}
 	public int numeroDeFuncionarios() {
 		return funcionarios.size();
@@ -273,7 +284,7 @@ public class Empresa implements Organizacao{
 				contratos.add(cont);
 				aux_vaga.setId_Veiculo(0);
 				aux_vaga.liberaVaga();
-				System.out.println(aux_vaga.getNumero()+";"+aux_vaga.getOcupacao());
+				//System.out.println(aux_vaga.getNumero()+";"+aux_vaga.getOcupacao());
 				aux_garagem.atualizaVaga(aux_vaga,aux_veiculo.getId_vaga());				
 				atualizaDadosGaragem(aux_garagem,aux_veiculo.getId_garagem());
 				aux_veiculo.setId_vaga(0);
@@ -290,7 +301,7 @@ public class Empresa implements Organizacao{
 				return comparacao;
 			}
 		}
-		System.out.println("Contrato não encontrado");
+		//System.out.println("Contrato não encontrado");
 		return null;
 	}
 	public void atualizaDadosContrato(Contrato contrato,int idContrato) {
@@ -311,7 +322,7 @@ public class Empresa implements Organizacao{
 		BufferedReader br = new BufferedReader(isr);
 		String s = br.readLine();
 		if (s.equals("")) {
-			System.out.println("Arquivo de Contrato está vazio");
+			//System.out.println("Arquivo de Contrato está vazio");
 		}else{
 			int aux_idCli,aux_idVei,aux_idCont,aux_parc,aux_rest;
 			double aux_valor;
@@ -343,10 +354,10 @@ public class Empresa implements Organizacao{
 		br.close();
 		isr.close();
 		fis.close();
-		System.out.println("FIM CARREGA CONTRATOS");
+		//System.out.println("FIM CARREGA CONTRATOS");
 	}
 	public void salvaDadosContratos()throws IOException{
-		OutputStream os = new FileOutputStream("dados/contratosssss.txt");
+		OutputStream os = new FileOutputStream("dados/contratos_salvamento.txt");
 		OutputStreamWriter osw = new OutputStreamWriter(os);
 		BufferedWriter bw = new BufferedWriter(osw);
 		for(int i=0;i<contratos.size();i++) {
@@ -357,7 +368,7 @@ public class Empresa implements Organizacao{
 		bw.close();
 		osw.close();
 		os.close();
-		System.out.println("FIM SALVA CONTRATOS");
+		//System.out.println("FIM SALVA CONTRATOS");
 	}
 	public void pagaParcelaContrato(int idContrato, int parcela, double valor){
 		Contrato aux_contrato = retornaContrato(idContrato);
@@ -385,7 +396,7 @@ public class Empresa implements Organizacao{
 			//atualizaDadosGaragem(aux_garagem,aux_garagem.getIdGaragem());
 			//atualizaDadosVeiculo(aux_veiculo,aux_veiculo.getIdCadastro());
 		}else {
-			System.out.println("Ainda há parcelas a serem pagas");
+			//System.out.println("Ainda há parcelas a serem pagas");
 		}
 		
 	}
@@ -398,7 +409,7 @@ public class Empresa implements Organizacao{
 		if(aux_ind==-1) {contr = retornaContrato(aux_id);}
 		Cliente clie = retornaCliente(contr.getIdCliente());
 		Veiculo veic = retornaVeiculo(contr.getIdVeiculo());
-		String s = contr.toString(0,clie.getCPF());// 0 deve ser substituido pela placa
+		String s = contr.toString(veic.getIdCadastro(),clie.getCPF());// 0 deve ser substituido pela placa
 		return s;
 	}
 	
@@ -494,7 +505,7 @@ public class Empresa implements Organizacao{
 		return clientes.size();
 	}
 	public void salvaDadosClientes()throws IOException{
-		OutputStream os = new FileOutputStream("dados/clientessss.txt");
+		OutputStream os = new FileOutputStream("dados/clientes_salvamento.txt");
 		OutputStreamWriter osw = new OutputStreamWriter(os);
 		BufferedWriter bw = new BufferedWriter(osw);
 		for (int i=0; i<clientes.size();i++) {

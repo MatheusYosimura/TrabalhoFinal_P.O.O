@@ -78,7 +78,7 @@ public class Garagem {
 		return garagem;//APOS RETORNAR, AS VAGAS DEVEM SER ASSOCIADAS AO SEUS VEICULOS
 	}
 	public void salvaDadosGaragem()throws IOException {
-		OutputStream os = new FileOutputStream("dados/garagem/garagem_"+getIdGaragem()+"xx.txt");
+		OutputStream os = new FileOutputStream("dados/garagem/garagem_"+getIdGaragem()+"_salvamento.txt");
 		OutputStreamWriter osw = new OutputStreamWriter(os);
 		BufferedWriter bw = new BufferedWriter(osw);
 		bw.write(getNome()+";"+getEndereco()+";"+vagas.size()+";"+getIdGaragem()+";\n");
@@ -117,7 +117,7 @@ public class Garagem {
 		return vagas.get(index);
 	}
 	public void salvaDadosVagas()throws IOException {
-		OutputStream os = new FileOutputStream("dados/vagas/vagas_"+getIdGaragem()+"xx.txt");
+		OutputStream os = new FileOutputStream("dados/vagas/vagas_"+getIdGaragem()+"_salvamento.txt");
 		OutputStreamWriter osw = new OutputStreamWriter(os);
 		BufferedWriter bw = new BufferedWriter(osw);
 		for (int i=0; i<vagas.size();i++) {

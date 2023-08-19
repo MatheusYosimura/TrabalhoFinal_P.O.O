@@ -39,7 +39,7 @@ public class Contrato {
 		String s = "+-----------\n"+
 				   "| Contrato n: "+getIdContrato()+"\n"+
 				   "+-----------\n"+
-				   "|Veiculo: *********"+"\n"+
+				   "|Veiculo: "+Carro+"\n"+
 				   "|CPF Cliente: "+CPF+"\n"+
 				   "|Validade: "+getValidade()+"\n"+
 				   "+-----------\n"+

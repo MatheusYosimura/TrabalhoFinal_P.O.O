@@ -153,7 +153,7 @@ public class Painel {
 		String nome = JOptionPane.showInputDialog(null,"Insira o nome do Veiculo: ","");
 		String modelo = JOptionPane.showInputDialog(null,"Insira o modelo do Veículo:","");
 		String ano =JOptionPane.showInputDialog(null,"Insira o ano do Veículo:","");
-		if(nome.equals("")||modelo.equals("")||ano.equals("")) {
+		if(nome.equals("")||nome==null||modelo==null||modelo.equals("")||ano==null||ano.equals("")) {
 			new TratamentoExcecoes("Valores inseridos invalidos, tente novamente");
 			Principal.nav=20;
 			return emp;

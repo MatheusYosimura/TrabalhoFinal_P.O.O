@@ -1,12 +1,11 @@
 package pacote;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 public class Principal {
 	public static int nav=0;//Variável para navegar pelos paineis
 	public static void main ( String[] args) throws IOException {
-		ArrayList<Garagem> garagem = null;
+		ArrayList<Garagem> garagem = new ArrayList<Garagem>();
 		Empresa empresa = null;
 		while(true) {
 			switch (nav) {
@@ -148,7 +147,7 @@ public class Principal {
 						Garagem g = garagem.get(i);
 						g.salvaDadosGaragem();
 						}
-					System.exit(0);
+						nav=1;
 					break;
 				default :
 					break;
